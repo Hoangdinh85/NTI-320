@@ -16,7 +16,6 @@ systemctl enable nrpe
 systemctl start nrpe
 yum -y  install nagios-plugins-all
 yum -y install nagios-plugins-nrpe
-
 htpasswd -c /etc/nagios/passwd nagiosadmin
 chmod 666 /var/log/nagios/nagios.log 
 
@@ -26,7 +25,14 @@ systemctl restart nagios
 
 #configure generate_config.sh
 #paste the generate_config.sh for github to the vim file.
-vim generate_config.sh
+#vim generate_config.sh
 
 chmod +x generate_config.sh 
+
+echo "define command{
+                                command_name check_nrpe
+                                command_line /usr/lib64/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+                                }" >> /etc/nagios/objects/commands.cfg
+                                
+systemctl restart nagios
 
