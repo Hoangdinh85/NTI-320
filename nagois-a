@@ -25,9 +25,8 @@ systemctl restart nagios
 
 
 #configure generate_config.sh
-vim generate_config.sh
 #paste the generate_config.sh for github to the vim file.
-
+vim generate_config.sh
 
 chmod +x generate_config.sh 
 
