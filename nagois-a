@@ -22,3 +22,12 @@ chmod 666 /var/log/nagios/nagios.log
 
 /usr/sbin/nagios -v /etc/nagios/nagios.cfg
 systemctl restart nagios
+
+
+#configure generate_config.sh
+vim generate_config.sh
+#paste the generate_config.sh for github to the vim file.
+
+
+chmod +x generate_config.sh 
+
