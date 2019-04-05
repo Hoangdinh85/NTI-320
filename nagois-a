@@ -1,15 +1,22 @@
+#this is to install the nagios
 yum -y install nagios
+
+#enable and start nagios
 systemctl enable nagios
 systemctl start nagios
+#turn off SElinux
 setenforce 0
+#allow http service
 yum -y install httpd
 systemctl enable httpd
 systemctl start httpd
+#this install nrpe
 yum -y install nrpe
 systemctl enable nrpe
 systemctl start nrpe
 yum -y  install nagios-plugins-all
 yum -y install nagios-plugins-nrpe
+
 htpasswd -c /etc/nagios/passwd nagiosadmin
 chmod 666 /var/log/nagios/nagios.log 
 
