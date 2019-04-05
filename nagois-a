@@ -12,3 +12,4 @@ yum -y  install nagios-plugins-all
 yum -y install nagios-plugins-nrpe
 htpasswd -c /etc/nagios/passwd nagiosadmin
 chmod 666 /var/log/nagios/nagios.log 
+systemctl restart nagios
