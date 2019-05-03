@@ -4,12 +4,15 @@ yum -y install nagios
 #enable and start nagios
 systemctl enable nagios
 systemctl start nagios
+
 #turn off SElinux
 setenforce 0
+
 #allow http service
 yum -y install httpd
 systemctl enable httpd
 systemctl start httpd
+
 #this install nrpe
 yum -y install nrpe
 systemctl enable nrpe
@@ -24,7 +27,7 @@ sed -i '51 s/^#//' /etc/nagios/nagios.cfg
 # I also had to: 
 usermod -a -G nagios hdinh47056
 #give premission to write:
-chmod 775 /etc/nagios/servers
+chmod 777 /etc/nagios/servers
 
 
 
