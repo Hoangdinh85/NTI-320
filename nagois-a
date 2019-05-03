@@ -21,6 +21,10 @@ chmod 666 /var/log/nagios/nagios.log
 mkdir /etc/nagios/servers
 sed -i '51 s/^#//' /etc/nagios/nagios.cfg
 
+# I also had to: 
+chmod 775 /etc/nagios/servers
+usermod -a -G nagios hdinh47056
+
 echo "define command{
                                 command_name check_nrpe
                                 command_line /usr/lib64/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
