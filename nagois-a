@@ -22,8 +22,11 @@ mkdir /etc/nagios/servers
 sed -i '51 s/^#//' /etc/nagios/nagios.cfg
 
 # I also had to: 
-chmod 775 /etc/nagios/servers
 usermod -a -G nagios hdinh47056
+#give premission to write:
+chmod 775 /etc/nagios/servers
+
+
 
 echo "define command{
                                 command_name check_nrpe
