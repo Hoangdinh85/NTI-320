@@ -53,6 +53,6 @@ systemctl restart httpd.service
 # Set up the cacti cron
 sed -i 's/#//g' /etc/cron.d/cacti
 setenforce 0
-
+systemctl start httpd
 
 
