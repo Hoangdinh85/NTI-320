@@ -1,3 +1,4 @@
+#!/bin/bash
 yum -y install cacti               # Installes a number of packages, including mariadb, httpd, php and so on
 yum -y install mariadb-server         # The mysql/mariadb client installs with the cacti stack but not the server
                                    # If you want to have multiple cacti nodes, considder using the client and connecting
@@ -48,11 +49,11 @@ sed -i "s/\$database_password = 'cactiuser';/\$database_password = 'P@ssw0rd1';/
 cp /etc/php.ini /etc/php.ini.orig
 sed -i 's/;date.timezone =/date.timezone = America\/Regina/' /etc/php.ini
 
+for servername in $(gcloud compute instances list | awk '{print $1}' | sed "1 d" | grep -v nagios-a );  do gcloud compute ssh --zone us-east4-c hdinh47056@$servername --command='sudo yum -y install wget && sudo wget https://raw.githubusercontent.com/Hoangdinh85/NTI-310/master/nagios-client && sudo bash nagios-client'; done
+
 systemctl restart httpd.service
 
 # Set up the cacti cron
 sed -i 's/#//g' /etc/cron.d/cacti
 setenforce 0
 systemctl start httpd
-
-
