@@ -1,0 +1,18 @@
+#!/bin/bash
+#This script spins up an ubuntu client-a
+
+#this line installs the nfs-client for the ubuntu 18.04LS
+apt-get install -y nfs-client
+
+#a testing location
+mkdir /mnt/test
+
+#this line echos the files and places them in the /etc/fstab
+echo "nfs-a:/var/nfsshare/testing     /mnt/test     nfs     defaults 0 0" >> /etc/fstab
+
+#this line proves its in the file
+#vim /etc/fstab
+
+#this line mounts it
+mount -a
+© 2019 GitHub, Inc.
