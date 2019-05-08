@@ -1,0 +1,238 @@
+#!/bin/bash
+
+#Install git
+yum install -y git
+#change directory to tmp
+cd /tmp
+#clone git from my respository
+git clone https://github.com/Hoangdinh85/NTI-310.git
+
+
+#install ldap servers and clients
+yum -y install openldap-servers openldap-clients
+
+#copy DB_CONFIG.example to DB_CONFIG
+cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG 
+chown ldap. /var/lib/ldap/DB_CONFIG
+
+#enable and start slapd
+systemctl enable slapd
+systemctl start slapd
+
+
+#install httpd and phpldapadmin
+yum -y install httpd 
+yum install epel-release 
+yum -y install phpldapadmin 
+
+
+# some source editing
+# Tell SE linux what's going on, so that it doesn't freek
+# allow apache http connect to ldap 
+setsebool -P httpd_can_connect_ldap on
+
+#enable and start httpd
+systemctl enable httpd
+systemctl start httpd
+
+# modify our http.com allow us to access from web
+sed -i 's,Require local,#Require local\n Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
+
+#cp an alias cp without confirmation
+unalias cp
+
+#copy config file on github to phpldapadmin.config.php
+cp /tmp/NTI-310/config.php /ect/phpldapadmin/config.php.orig
+
+#change ownership 
+chown ldap:apache /etc/phpldapadmin/config.php
+
+#this line was used to move into the temp director so we could make the following
+cd /tmp
+
+#restart systemctl httpd.service
+systemctl restart httpd.service
+
+#Generates and stores new passwd securely
+newsecret="mypassword"
+newhash=$(slappasswd -s "$newsecret")
+#newhash=(slappasswd -s "mypassword")
+echo -n "$newsecret" > /root/ldap_admin_pass
+#echo -n "mypassword" > /root/ldap_admin_pass
+chmod 0600 /root/ldap_admin_pass
+
+#configure the root domain
+echo -e "dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcSuffix
+olcSuffix: dc=nti310,dc=local
+\n
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=ldapadm,dc=nti310,dc=local
+\n
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootPW
+olcRootPW: $newhash" > db.ldif
+ldapmodify -Y EXTERNAL -H ldapi:/// -f db.ldif
+
+# Auth Restriction
+echo 'dn: olcDatabase={1}monitor,cn=config
+changetype: modify
+replace: olcAccess
+olcAccess: {0}to * by dn.base="gidNumber=0+uidNumber=0,cn=peercred,cn=external, cn=auth" read by dn.base="cn=ldapadm,dc=nti310,dc=local" read by * none' > monitor.ldif
+
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f monitor.ldif
+
+# Generate ssl certs on the padlock on port 443 http
+openssl req -new -x509 -nodes -out /etc/openldap/certs/nti310ldapcert.pem -keyout /etc/openldap/certs/nti310ldapkey.pem -days 365 -subj "/C=US/ST=WA/L=Seattle/O=SCC/OU=IT/CN=nti310.local"
+
+#change the ownership from ldap to local /etc/openldap/certs/nti310 location
+chown -R ldap. /etc/openldap/certs/nti*.pem
+
+# Use Certs in LDAP
+
+#Enter each command seperately.
+echo -e dn: cn=config
+changetype: modify
+replace: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/openldap/certs/nti310ldapkey.pem" > certs.ldif
+#Enter each command seperately.
+dn: cn=config
+changetype: modify
+replace: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/openldap/certs/nti310ldapcert.pem
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f certs.ldif
+# Test cert configuration
+slaptest -u
+#this unalias cp will let the system think it's not cp
+unalias cp
+#provide different schema for ldif
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif 
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
+# Create base group, top domain, ldap manager, and people structure
+echo "dn: dc=nti310,dc=local
+dc: nti310
+objectClass: top
+objectClass: domain
+\n
+dn: cn=ldapadm ,dc=nti310,dc=local
+objectClass: organizationalRole
+cn: ldapadm
+description: LDAP Manager
+\n
+dn: ou=People,dc=nti310,dc=local
+objectClass: organizationalUnit
+ou: People
+\n
+dn: ou=Group,dc=nti310,dc=local
+objectClass: organizationalUnit
+ou: Group" > base.ldif
+#this line set SELinux 0
+setenforce 0
+ldapadd -x -W -D "cn=ldapadm,dc=nti310,dc=local" -f base.ldif -y /root/ldap_admin_pass
+#create users in people on LDAP
+echo -e "version: 1
+\n
+# Entry 1: cn=John Doe,ou=People,dc=nti310,dc=local
+dn: cn=John Doe,ou=People,dc=nti310,dc=local
+cn: John Doe
+gidnumber: 500
+givenname: John
+homedirectory: /home/jdoe
+loginshell: /bin/sh
+objectclass: inetOrgPerson
+objectclass: posixAccount
+objectclass: top
+sn: joe
+uid: jdoe
+uidnumber: 1001
+userpassword: {SHA}IPWlazm7QvCO91AZ1zCNJCUNhm4=
+\n
+# Entry 2: cn=James Smith,ou=People,dc=nti310,dc=local
+dn: cn=James Smith,ou=People,dc=nti310,dc=local
+cn: James Smith
+gidnumber: 500
+givenname: James
+homedirectory: /home/jsmith
+loginshell: /bin/sh
+objectclass: inetOrgPerson
+objectclass: posixAccount
+objectclass: top
+sn: Smith
+uid: jsmith
+uidnumber: 1002
+userpassword: {SHA}IPWlazm7QvCO91AZ1zCNJCUNhm4=
+\n
+# Entry 3: cn=Austin Smith,ou=People,dc=nti310,dc=local
+dn: cn=Austin Smith,ou=People,dc=nti310,dc=local
+cn: Austin Smith
+gidnumber: 500
+givenname: Austin
+homedirectory: /home/asmith
+loginshell: /bin/sh
+objectclass: inetOrgPerson
+objectclass: posixAccount
+objectclass: top
+sn: Smith
+uid: asmith
+uidnumber: 1003
+userpassword: {SHA}IPWlazm7QvCO91AZ1zCNJCUNhm4=
+\n
+# Entry 4: cn=Matthew Halls,ou=People,dc=nti310,dc=local
+dn: cn=Matthew Halls,ou=People,dc=nti310,dc=local
+cn: Matthew Halls
+gidnumber: 500
+givenname: Matthew
+homedirectory: /home/mhalls
+loginshell: /bin/sh
+objectclass: inetOrgPerson
+objectclass: posixAccount
+objectclass: top
+sn: Halls
+uid: mhalls
+uidnumber: 1004
+userpassword: {SHA}IPWlazm7QvCO91AZ1zCNJCUNhm4=
+\n
+# Entry 5: cn=Bill Vo,ou=People,dc=nti310,dc=local
+dn: cn=Bill Vo,ou=People,dc=nti310,dc=local
+cn: Bill Vo
+gidnumber: 500
+givenname: Bill
+homedirectory: /home/bvo
+loginshell: /bin/sh
+objectclass: inetOrgPerson
+objectclass: posixAccount
+objectclass: top
+sn: Vo
+uid: bvo
+uidnumber: 1005
+userpassword: {SHA}IPWlazm7QvCO91AZ1zCNJCUNhm4=" > /tmp/user1.ldif
+\n
+ldapadd -x -W -D "cn=ldapadm,dc=nti310,dc=local" -f user1.ldif -y /root/ldap_admin_pass
+\n
+echo -e "
+#create group in OU on LDAP.
+# Entry 1: cn=Group1,ou=Group,dc=nti310,dc=local
+dn: cn=Group1,ou=Group,dc=nti310,dc=local
+cn: Group1
+gidnumber: 501
+objectclass: posixGroup
+objectclass: top
+\n
+# Entry 2: cn=Group2,ou=Group,dc=nti310,dc=local
+dn: cn=Group2,ou=Group,dc=nti310,dc=local
+cn: Group2
+gidnumber: 501
+objectclass: posixGroup
+objectclass: top
+\n
+ldapadd -x -W -D "cn=ldapadm,dc=nti310,dc=local" -f groups.ldif -y /root/ldap_admin_pass
+
+for servername in $(gcloud compute instances list | awk '{print $1}' | sed "1 d" | grep -v nagios-a );  do gcloud compute ssh --zone us-east4-c hdinh47056@$servername --command='sudo yum -y install wget && sudo wget https://raw.githubusercontent.com/Hoangdinh85/NTI-310/master/nagios-client && sudo bash nagios-client'; done
+
+#restart the systemctl httpd
+systemctl restart httpd
