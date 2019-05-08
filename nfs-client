@@ -15,4 +15,3 @@ echo "nfs-a:/var/nfsshare/testing     /mnt/test     nfs     defaults 0 0" >> /et
 
 #this line mounts it
 mount -a
-© 2019 GitHub, Inc.
