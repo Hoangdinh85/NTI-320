@@ -1,8 +1,8 @@
 #!/bin/bash
 
-for servername in $(gcloud compute instances list | awk '{print $1}' | sed "1 d" | grep -v nagios-a );  do 
+for servername in $(gcloud compute instances list | awk '{print $1}' | sed "1 d" | grep -v nagios1 );  do 
     echo $servername;
     serverip=$( gcloud compute instances list | grep $servername | awk '{print $4}');
     echo $serverip ;
 done
-gcloud compute ssh --zone us-east4-c hdinh47056@nagios-a --command='sudo systemctl restart nagio'
+gcloud compute ssh --zone us-east4-c hdinh47056@nagios1 --command='sudo systemctl restart nagio'
