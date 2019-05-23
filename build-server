@@ -1,0 +1,9 @@
+yum install rpm-build
+elfutils-libelf
+rpm
+rpm-libs
+rpm-python
+
+cd /root/rpmbuild/SOURCES/
+
+wget http://downloads.xiph.org/releases/icecast/icecast-2.3.3.tar.gz
