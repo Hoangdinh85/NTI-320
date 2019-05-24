@@ -1,8 +1,6 @@
-yum install rpm-build
-elfutils-libelf
-rpm
-rpm-libs
-rpm-python
+yum -y install rpm-build
+
+
 
 cd /root/rpmbuild/SOURCES/
 
