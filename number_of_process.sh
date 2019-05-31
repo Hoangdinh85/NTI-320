@@ -2,7 +2,7 @@
 # This is a script meant to let us test NRPE
 # plugins we write
 
-Status$=(ps aux | grep -c "")                 #the number of count
+Status=$(ps aux | grep -c "")                 #the number of count
 
 status="0"                                  # Change the status to test different alert states
 
