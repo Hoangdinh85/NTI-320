@@ -21,7 +21,7 @@ gcloud compute instances create build-server1 \
 --machine-type f1-micro \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/build-server \
---private-network-ip=10.138.0.1
+--private-network-ip=10.138.0.13
 
 ##Repos_Srv##
 gcloud compute instances create repos-srv \
