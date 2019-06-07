@@ -2,6 +2,15 @@
 #Setup for Final
 git clone https://github.com/Hoangdinh85/NTI-320/
 
+##LOGSERVER##
+gcloud compute instances create rsyslog1 \
+--image-family centos-7 \
+--image-project centos-cloud \
+--zone us-west1-b \
+--machine-type f1-micro \
+--scopes cloud-platform \
+--metadata-from-file startup-script=NTI-320/rsyslog
+--private-network-ip=10.138.0.6
 
 ##Build-Server##
 gcloud compute instances create build-server1 \
@@ -58,17 +67,6 @@ gcloud compute instances create cacti1 \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/cacti_install
 --private-network-ip=10.138.0.5
-
-
-##LOGSERVER##
-gcloud compute instances create rsyslog1 \
---image-family centos-7 \
---image-project centos-cloud \
---zone us-west1-b \
---machine-type f1-micro \
---scopes cloud-platform \
---metadata-from-file startup-script=NTI-320/rsyslog
---private-network-ip=10.138.0.6
 
 
 ##POSTGRES##
