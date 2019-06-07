@@ -12,7 +12,29 @@ gcloud compute instances create build-server1 \
 --machine-type f1-micro \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/build-server
+--private-network-ip=10.138.0.1
 
+##Repos_Srv##
+gcloud compute instances create repos-srv \
+--image-family centos-7 \
+--image-project centos-cloud \
+--zone us-west1-b \
+--tags "http-server","https-server" \
+--machine-type f1-micro \
+--scopes cloud-platform \
+--metadata-from-file startup-script=NTI-320/repos_srv.sh
+--private-network-ip=10.138.0.2
+
+##Repos_Client##
+gcloud compute instances create repos-client \
+--image-family centos-7 \
+--image-project centos-cloud \
+--zone us-west1-b \
+--tags "http-server","https-server" \
+--machine-type f1-micro \
+--scopes cloud-platform \
+--metadata-from-file startup-script=NTI-320/repos_client.sh
+--private-network-ip=10.138.0.3
 
 ##NAGIOSSERVER##
 gcloud compute instances create nagios1 \
@@ -23,6 +45,7 @@ gcloud compute instances create nagios1 \
 --machine-type f1-micro \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/nagios-a
+--private-network-ip=10.138.0.4
 
 
 ##CACTISERVER##
@@ -34,6 +57,7 @@ gcloud compute instances create cacti1 \
 --machine-type f1-micro \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/cacti_install
+--private-network-ip=10.138.0.5
 
 
 ##LOGSERVER##
@@ -44,6 +68,7 @@ gcloud compute instances create rsyslog1 \
 --machine-type f1-micro \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/rsyslog
+--private-network-ip=10.138.0.6
 
 
 ##POSTGRES##
@@ -55,6 +80,7 @@ gcloud compute instances create postgres1 \
 --machine-type f1-micro \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/InstallPostgres
+--private-network-ip=10.138.0.7
 
 
 ##LDAPSERVER##
@@ -66,6 +92,7 @@ gcloud compute instances create ldap1 \
 --machine-type f1-micro \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/LDAPC
+--private-network-ip=10.138.0.8
 
 
 ##NFSSERVER##
@@ -77,6 +104,7 @@ gcloud compute instances create nfs1 \
 --machine-type f1-micro \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/nfs-a
+--private-network-ip=10.138.0.9
 
 
 ##DJANGO##
@@ -88,6 +116,7 @@ gcloud compute instances create django1 \
 --machine-type f1-micro \
 --scopes cloud-platform \
 --metadata-from-file startup-script=NTI-320/django
+--private-network-ip=10.138.0.10
 
  
 #NFSCLIENT##
@@ -97,8 +126,8 @@ gcloud compute instances create nfs-client1 \
 --zone us-west1-b \
 --machine-type f1-micro \
 --scopes cloud-platform \
---metadata-from-file startup-script=NTI-310/nfs-client 
-
+--metadata-from-file startup-script=NTI-320/nfs-client 
+--private-network-ip=10.138.0.11
 
 ##LDAPCLIENT##
 gcloud compute instances create ldapclient1 \
@@ -107,4 +136,5 @@ gcloud compute instances create ldapclient1 \
 --zone us-west1-b \
 --machine-type f1-micro \
 --scopes cloud-platform \
---metadata-from-file startup-script=NTI-310/ldapclient.sh
+--metadata-from-file startup-script=NTI-320/ldapclient.sh
+--private-network-ip=10.138.0.12
