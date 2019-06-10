@@ -7,9 +7,8 @@ systemctl start nrpe
 
 #sed statements for /etc/nagios/nrpe.cfg
 #this allow the nagios server to connect with the client.
-yum -y install nagios-nrpe-server nagios-plugins
-yum -y install nrpe
 sed -i 's/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1, 10.138.0.4/g' /etc/nagios/nrpe.cfg
+
 #this allow the check sum
 sed -i 's,#command\[check_users\]=/usr/lib64/nagios/plugins/check_users \$ARG1\$,command\[check_users\]=/usr/lib64/nagios/plugins/check_users -w 5 -c 10,g' /etc/nagios/nrpe.cfg
 sed -i 's:#command\[check_load\]=/usr/lib64/nagios/plugins/check_load \$ARG1\$:command\[check_load\]=/usr/lib64/nagios/plugins/check_load -w 15,10,5 -c 30,25,20:g' /etc/nagios/nrpe.cfg
