@@ -3,7 +3,7 @@
 git clone https://github.com/Hoangdinh85/NTI-320/
 
 ##LOGSERVER##
-gcloud compute instances create rsyslog \
+gcloud compute instances create rsyslog1 \
 --image-family centos-7 \
 --image-project centos-cloud \
 --zone us-west1-b \
