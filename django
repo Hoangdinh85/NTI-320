@@ -17,10 +17,20 @@ django-admin.py startproject myproject .
 
 
 
-wget -O ~/myproject/myproject/settings.py https://github.com/Hoangdinh85/NTI-310/blob/master/settings.py
+wget -O ~/myproject/myproject/settings.py https://raw.githubusercontent.com/Hoangdinh85/NTI-320/master/settings.py
 
 python manage.py makemigrations
 python manage.py migrate
 
+#setting up machine to run as rsyslog client to server rsyslog
+#install this on a server
+#rsyslog should be first server run up
+#rsyslog client automation
+sudo yum -y install && yum -y update rsyslog
+sudo systemctl start rsyslog
+sudo systemctl enable rsyslog
 
-for servername in $(gcloud compute instances list | awk '{print $1}' | sed "1 d" | grep -v nagios-a );  do gcloud compute ssh --zone us-east4-c hdinh47056@$servername --command='sudo yum -y install wget && sudo wget https://raw.githubusercontent.com/Hoangdinh85/NTI-310/master/nagios-client && sudo bash nagios-client'; done
+#needs to be the name of the client rsyslog server
+echo "*.*@@rsyslog:514" >> /etc/rsyslog.conf
+#systemctl restart rsyslog
+#systemctl enable rsyslog
