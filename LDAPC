@@ -282,4 +282,6 @@ sudo systemctl enable rsyslog
 
 #sending the logs to rsyslog
 echo "*.* @@rsyslog:514" >> /etc/rsyslog.conf
+systemctl restart rsyslog
+systemctl status rsyslog
 
