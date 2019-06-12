@@ -41,11 +41,13 @@ sed -i "s/$conf\['owned_only'\] = false;/$conf['owned_only'] = true;/g" /etc/php
 systemctl restart httpd
 systemctl restart postgresql
 #http://34.73.126.88/phpPgAdmin/
+
+#Installing and updating syslog
 sudo yum -y install && yum -y update rsyslog
 sudo systemctl start rsyslog
 sudo systemctl enable rsyslog
 
 #needs to be the name of the client rsyslog server
-echo "*.*@@rsyslog1:514" >> /etc/rsyslog.conf
+echo "*.*@@rsyslog:514" >> /etc/rsyslog.conf
 #systemctl restart rsyslog
 #systemctl enable rsyslog
