@@ -48,6 +48,6 @@ sudo systemctl start rsyslog
 sudo systemctl enable rsyslog
 
 #needs to be the name of the client rsyslog server
-echo "*.*@@rsyslog:514" >> /etc/rsyslog.conf
+echo "*.* @@rsyslog:514" >> /etc/rsyslog.conf
 #systemctl restart rsyslog
 #systemctl enable rsyslog
