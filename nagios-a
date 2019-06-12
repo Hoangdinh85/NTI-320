@@ -1,47 +1,72 @@
 #!/bin/bash
-#this is to install the nagios
-yum -y install nagios
+##From https://github.com/nic-instruction/NTI-320/blob/master/nagios/nagios_install.sh
 
-#enable and start nagios
+#####INSTALL NAGIOS
+yum -y install nagios
 systemctl enable nagios
 systemctl start nagios
 
-#turn off SElinux
+#####TURN OFF SE LINUX
 setenforce 0
 
-#allow http service
+#####INSTALL APACHE
 yum -y install httpd
 systemctl enable httpd
 systemctl start httpd
 
-#this install nrpe
+#####NAGIOS
 yum -y install nrpe
 systemctl enable nrpe
 systemctl start nrpe
-yum -y  install nagios-plugins-all
+
+#####INSTALL NAGIOS SERVER PLUGINS
+yum -y install nagios-plugins-all
+
+#####INSTALL NAGIOS CLIENT PLUGINS
 yum -y install nagios-plugins-nrpe
-htpasswd -b -c /etc/nagios/passwd nagiosadmin nagiosadmin
+
+#####ENABLE SWAP#####
+#####https://www.digitalocean.com/community/tutorials/how-to-install-nagios-on-centos-6
+dd if=/dev/zero of=/swap bs=1024 count=2097152
+mkswap /swap && chown root. /swap && chmod 0600 /swap && swapon /swap
+echo /swap swap swap defaults 0 0 >> /etc/fstab
+echo vm.swappiness = 0 >> /etc/sysctl.conf && sysctl -p
+
+#####CREATE PASSWORD
+htpasswd -b -c ~/temp/password nagiosadmin nagiosadmin
+
+#####ENABLE rw/rw/rw FOR LOGS
 chmod 666 /var/log/nagios/nagios.log
-mkdir /etc/nagios/servers
+
+#####UNCOMMENT LINE TO ENABLE NAGIOS.CFG
 sed -i '51 s/^#//' /etc/nagios/nagios.cfg
 
-# I also had to: 
-usermod -a -G nagios hdinh47056
-#give premission to write:
-chmod 777 /etc/nagios/servers
-
-
-
-echo "define command{
-                                command_name check_nrpe
-                                command_line /usr/lib64/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
-                                }" >> /etc/nagios/objects/commands.cfg
-                                
+#####RESTARTING NAGIOS TO BYPASS SE LINUX PREVENTIONS
 systemctl restart nagios
 
-#Further configuration:
-#https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/monitoring-publicservices.html (Links to an external site.)
+# Need to put the NRPE changes into your config file
+echo '########### NRPE CONFIG LINE #######################
+        define command{
+        command_name check_nrpe
+        command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+}' >> /etc/nagios/objects/commands.cfg
+#####CREATING EMPTY FILE FOR NAGIOS TO FETCH THAT IT IS NOT FORBIDDEN FROM#####
+touch /var/www/html/index.html
+chmod 755 /var/www/html/index.html
 
+#####RESTARTING NAGIOS TO BYPASS SE LINUX PREVENTIONS
+systemctl restart nagios
+
+#######Making Servers File for configuration######
+####mkdir
+mkdir /etc/nagios/servers
+sed '51i\ cfg_dir=/etc/nagios/servers'
+
+####Need to add user to nagios group so secure copy to nagios works
+usermod -a -G nagios hdinh47056
+
+####elevate /etc/nagios/servers
+chmod 777 /etc/nagios/servers
 
 #verify
 /usr/sbin/nagios -v /etc/nagios/nagios.cfg
