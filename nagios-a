@@ -69,4 +69,4 @@ usermod -a -G nagios hdinh47056
 chmod 777 /etc/nagios/servers
 
 #verify
-/usr/sbin/nagios -v /etc/nagios/nagios.cfg
+#/usr/sbin/nagios -v /etc/nagios/nagios.cfg
