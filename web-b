@@ -8,15 +8,15 @@ systemctl start httpd
 #yum -y install nrpe nagios-nrpe-server nagios-plugins
 yum install -y nagios-nrpe-server nagios-plugins nrpe nagios-plugins-load nagios-plugins-ping nagios-plugins-disk nagios-plugins-http nagios-plugins-procs nagios-plugins-users wget
 
-#####INSTALL MEMORY MONITOR#####
-###Need to point to my github
-wget -O /usr/lib64/nagios/plugins/check_mem.sh https://raw.githubusercontent.com/nic-instruction/NTI-320/master/nagios/check_mem.sh
-
-#####EXECUTE MEMORY MONITOR#####
-chmod +x /usr/lib64/nagios/plugins/check_mem.sh
+#####MRPE INSTALLATION#####
+yum -y install nrpe
 systemctl enable nrpe
 systemctl start nrpe
 
+#####INSTALL MEMORY MONITOR#####
+###Need to point to my github
+wget -O /usr/lib64/nagios/plugins/check_mem.sh https://raw.githubusercontent.com/nic-instruction/NTI-320/master/nagios/check_mem.sh
+chmod +x /usr/lib64/nagios/plugins/check_mem.sh
 
 #this allow the check sum
 sed -i 's,#command\[check_users\]=/usr/lib64/nagios/plugins/check_users \$ARG1\$,command\[check_users\]=/usr/lib64/nagios/plugins/check_users -w 5 -c 10,g' /etc/nagios/nrpe.cfg
