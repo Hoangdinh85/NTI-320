@@ -1,5 +1,5 @@
 #!/bin/bash
-bash /home/hdinh47056/NTI-320/generate_config.sh
+bash /home/hdinh47056/NTI-320/generate_config.sh $1 $2
 gcloud compute scp --zone us-west1-b $1.cfg hdinh47056@nagios1:/etc/nagios/servers
 # Note: I had to add user hdinh47056 to group nagios using usermod -a -G nagios hdinh47056
 # I also had to chmod 775 /etc/nagios/servers
