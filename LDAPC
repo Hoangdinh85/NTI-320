@@ -174,7 +174,6 @@ ldapadd -x -W -D "cn=ldapadm,dc=nti310,dc=local" -f base.ldif -y /root/ldap_admi
 # Version: 1.2.3
 
 echo -e "version: 1
-# Entry 1: cn=Koda Mondragon,ou=People,dc=nti310,dc=local
 dn: cn=Person1,ou=People,dc=nti310,dc=local
 cn: Person1
 gidnumber: 500
