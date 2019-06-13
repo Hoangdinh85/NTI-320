@@ -28,7 +28,7 @@ sed -i 's,#command\[check_mem\]=/usr/lib64/nagios/plugins/custom_check_mem -n \$
 
 #sed statements for /etc/nagios/nrpe.cfg
 #this allow the nagios server to connect with the client.
-sed -i 's/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1, 10.138.0.4/g' /etc/nagios/nrpe.cfg
+sed -i 's/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1, 10.138.0.3/g' /etc/nagios/nrpe.cfg
 
 
 #install plugins for nrpe
