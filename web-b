@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#####INSTALL APACHE#####
+yum -y install httpd
+systemctl enable httpd
+systemctl start httpd
+
 #yum -y install nrpe nagios-nrpe-server nagios-plugins
 yum install -y nagios-nrpe-server nagios-plugins nrpe nagios-plugins-load nagios-plugins-ping nagios-plugins-disk nagios-plugins-http nagios-plugins-procs nagios-plugins-users wget
 
