@@ -1,6 +1,6 @@
 #already has git installed
 #Setup for Final
-git clone https://github.com/Hoangdinh85/NTI-320/
+git clone https://github.com/Hoangdinh85/NTI-320.git
 
 ##LOGSERVER##
 gcloud compute instances create rsyslog \
